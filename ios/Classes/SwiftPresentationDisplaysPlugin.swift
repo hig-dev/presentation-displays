@@ -137,7 +137,9 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
             if (window != nil){
                 window!.isHidden=false
                 if (window!.rootViewController == nil || !(window!.rootViewController is FlutterViewController)){
-                    let extVC = FlutterViewController(project: nil, initialRoute: routerName, nibName: nil, bundle: nil)
+                    let flutterEngine = FlutterEngine()
+                    flutterEngine.run(withEntrypoint: "secondaryDisplayMain", initialRoute: routerName)
+                    let extVC = FlutterViewController(engine: flutterEngine, nibName: nil, bundle: nil)
                     SwiftPresentationDisplaysPlugin.controllerAdded!(extVC)
                     window?.rootViewController = extVC
 
@@ -163,7 +165,7 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
 class DisplayConnectedStreamHandler: NSObject, FlutterStreamHandler{
     var sink: FlutterEventSink?
     var didConnectObserver: NSObjectProtocol?
-    var didDisconnectObserver: NSObjectProtocol?
+    var didDisconnectObserver: NSObjectProtocol? 
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         sink = events
