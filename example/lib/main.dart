@@ -98,7 +98,7 @@ class _DisplayManagerScreenState extends State<DisplayManagerScreen> {
 
   @override
   void initState() {
-    displayManager.connectedDisplaysChangedStream?.listen(
+    displayManager.connectedDisplaysChangedStream.listen(
       (event) {
         debugPrint("connected displays changed: $event");
       },

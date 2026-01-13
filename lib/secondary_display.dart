@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:presentation_displays/displays_manager.dart';
 
 /// Only use a subscription to listen within the secondary display
 /// [arguments] returned  type [dynamic]
@@ -10,9 +9,11 @@ typedef ArgumentsCallback = Function(dynamic arguments);
 /// [SecondaryDisplay.callback] instance of [ArgumentsCallback] to receive data transmitted from the [DisplayManager].
 /// [SecondaryDisplay.child] child widget of secondary display
 class SecondaryDisplay extends StatefulWidget {
-  const SecondaryDisplay(
-      {Key? key, required this.callback, required this.child})
-      : super(key: key);
+  const SecondaryDisplay({
+    Key? key,
+    required this.callback,
+    required this.child,
+  }) : super(key: key);
 
   /// instance of [ArgumentsCallback] to receive data transmitted from the [DisplaysManager].
   final ArgumentsCallback callback;
@@ -25,24 +26,23 @@ class SecondaryDisplay extends StatefulWidget {
 }
 
 class _SecondaryDisplayState extends State<SecondaryDisplay> {
-  final _presentationChannel = "presentation_displays_plugin_engine";
-  late MethodChannel? _presentationMethodChannel;
+  static const _presentationChannel = "presentation_displays_plugin_engine";
+  late MethodChannel _presentationMethodChannel;
 
   @override
   void initState() {
-    _addListenerForPresentation(widget.callback);
     super.initState();
+    _presentationMethodChannel = const MethodChannel(_presentationChannel);
+    _presentationMethodChannel.setMethodCallHandler((call) async {
+      // It's good practice to check the method name, even if there is only one for now
+      if (call.method == "DataTransfer") {
+        widget.callback(call.arguments);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return widget.child;
-  }
-
-  _addListenerForPresentation(ArgumentsCallback function) {
-    _presentationMethodChannel = MethodChannel(_presentationChannel);
-    _presentationMethodChannel?.setMethodCallHandler((call) async {
-      function(call.arguments);
-    });
   }
 }

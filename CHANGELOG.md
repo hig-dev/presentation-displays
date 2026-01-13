@@ -1,3 +1,13 @@
+## 2.0.0
+
+* **Breaking Change (iOS):** Minimum iOS deployment target raised to **13.0**.
+* **Breaking Change (iOS):** Migrated to `UISceneDelegate` lifecycle.
+* This fixes crashes on iOS 13+ regarding `UIWindow` screen assignment.
+* **Action Required:** You must update your `Info.plist` to add the `UIWindowSceneSessionRoleExternalDisplay` configuration.
+* **Action Required:** Your `AppDelegate` must now conform to `FlutterImplicitEngineDelegate`.
+* **Feature:** Ability to hide presentation
+* General improvements to null safety and error handling.
+
 ## 1.0.0
 * Able to package android release build. Works fine in example app.
 

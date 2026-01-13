@@ -1,8 +1,64 @@
-Display displayFromJson(Map<String, dynamic> json) => Display(
-    displayId: json['displayId'],
-    flag: json['flags'],
-    name: json['name'],
-    rotation: json['rotation']);
+/// Provides information about of a logical display.
+/// <p>
+/// A logical display does not necessarily represent a particular physical display device
+/// such as the built-in screen or an external monitor.  The contents of a logical
+/// display may be presented on one or more physical displays according to the devices
+/// that are currently attached and whether mirroring has been enabled.
+/// Use the following methods to query the real display area:
+/// [Display.displayId], [Display.flag], [Display.rotation], [Display.name]
+/// </p>
+///
+class Display {
+  /// Gets the display id.
+  /// Each logical display has a unique id.
+  /// The default display has id [DEFAULT_DISPLAY]
+  final int? displayId;
+
+  /// Returns a combination of flags that describe the capabilities of the display.
+  /// @return The display flags.
+  ///
+  /// See [FLAG_SUPPORTS_PROTECTED_BUFFERS], [FLAG_SECURE], [FLAG_PRIVATE]
+  final int? flag;
+
+  /// Returns the rotation of the screen from its "natural" orientation.
+  /// The returned value may be [ROTATION_0]
+  /// (no rotation), [ROTATION_90], [ROTATION_180], or [ROTATION_270].  For
+  /// example, if a device has a naturally tall screen, and the user has
+  /// turned it on its side to go into a landscape orientation, the value
+  /// returned here may be either [ROTATION_90] or [ROTATION_270] depending on
+  /// the direction it was turned.  The angle is the rotation of the drawn
+  /// graphics on the screen, which is the opposite direction of the physical
+  /// rotation of the device.  For example, if the device is rotated 90
+  /// degrees counter-clockwise, to compensate rendering will be rotated by
+  /// 90 degrees clockwise and thus the returned value here will be
+  /// [ROTATION_90].
+  final int? rotation;
+
+  /// Gets the name of the display.
+  /// <p>
+  /// Note that some displays may be renamed by the user.
+  /// </p>
+  ///
+  /// @return The display's name.
+  final String? name;
+
+  Display({
+    required this.displayId,
+    this.flag,
+    required this.name,
+    this.rotation,
+  });
+
+  /// Factory constructor to create a Display from a map.
+  factory Display.fromJson(Map<String, dynamic> json) {
+    return Display(
+      displayId: json['displayId'],
+      flag: json['flags'],
+      name: json['name'],
+      rotation: json['rotation'],
+    );
+  }
+}
 
 /// The default Display id, which is the id of the built-in primary display
 /// assuming there is one.
@@ -93,53 +149,3 @@ const int ROTATION_180 = 2;
 
 /// Rotation constant: 270 degree rotation.
 const int ROTATION_270 = 3;
-
-/// Provides information about of a logical display.
-/// <p>
-/// A logical display does not necessarily represent a particular physical display device
-/// such as the built-in screen or an external monitor.  The contents of a logical
-/// display may be presented on one or more physical displays according to the devices
-/// that are currently attached and whether mirroring has been enabled.
-/// Use the following methods to query the real display area:
-/// [Display.displayId], [Display.flag], [Display.rotation], [Display.name]
-/// </p>
-///
-class Display {
-  /// Gets the display id.
-  /// <p>
-  /// Each logical display has a unique id.
-  /// The default display has id [DEFAULT_DISPLAY]
-  /// </p>
-  int? displayId = DEFAULT_DISPLAY;
-
-  /// Returns a combination of flags that describe the capabilities of the display.
-  /// @return The display flags.
-  ///
-  /// See [FLAG_SUPPORTS_PROTECTED_BUFFERS], [FLAG_SECURE], [FLAG_PRIVATE]
-  int? flag;
-
-  /// Returns the rotation of the screen from its "natural" orientation.
-  /// The returned value may be [ROTATION_0]
-  /// (no rotation), [ROTATION_90], [ROTATION_180], or [ROTATION_270].  For
-  /// example, if a device has a naturally tall screen, and the user has
-  /// turned it on its side to go into a landscape orientation, the value
-  /// returned here may be either [ROTATION_90] or [ROTATION_270] depending on
-  /// the direction it was turned.  The angle is the rotation of the drawn
-  /// graphics on the screen, which is the opposite direction of the physical
-  /// rotation of the device.  For example, if the device is rotated 90
-  /// degrees counter-clockwise, to compensate rendering will be rotated by
-  /// 90 degrees clockwise and thus the returned value here will be
-  /// [ROTATION_90].
-  int? rotation;
-
-  /// Gets the name of the display.
-  /// <p>
-  /// Note that some displays may be renamed by the user.
-  /// </p>
-  ///
-  /// @return The display's name.
-  String? name;
-
-  Display(
-      {required this.displayId, this.flag, required this.name, this.rotation});
-}

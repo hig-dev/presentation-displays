@@ -1,11 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:presentation_displays/display.dart';
-import 'package:presentation_displays/secondary_display.dart';
 
 const _listDisplay = "listDisplay";
 const _showPresentation = "showPresentation";
@@ -36,8 +32,8 @@ class DisplayManager {
   final _displayMethodChannelId = "presentation_displays_plugin";
   final _displayEventChannelId = "presentation_displays_plugin_events";
 
-  late MethodChannel? _displayMethodChannel;
-  late EventChannel? _displayEventChannel;
+  late final MethodChannel _displayMethodChannel;
+  late final EventChannel _displayEventChannel;
 
   DisplayManager() {
     _displayMethodChannel = MethodChannel(_displayMethodChannelId);
@@ -59,15 +55,25 @@ class DisplayManager {
   ///
   /// See [DISPLAY_CATEGORY_PRESENTATION]
   Future<List<Display>?> getDisplays({String? category}) async {
-    List<dynamic> origins = await jsonDecode((await _displayMethodChannel
-            ?.invokeMethod(_listDisplay, category))) ??
-        [];
-    List<Display> displays = [];
-    for (var element in origins) {
-      final map = jsonDecode(jsonEncode(element));
-      displays.add(displayFromJson(map as Map<String, dynamic>));
+    final result = await _displayMethodChannel.invokeMethod(_listDisplay, category);
+
+    if (result == null) return [];
+
+    // The iOS plugin returns a JSON String, while Android might return a List/Map directly.
+    // We handle both cases safely.
+    List<dynamic> origins;
+    if (result is String) {
+      origins = jsonDecode(result);
+    } else if (result is List) {
+      origins = result;
+    } else {
+      return [];
     }
-    return displays;
+
+    // Map directly to Display objects without redundant re-encoding
+    return origins.map((element) {
+      return Display.fromJson(Map<String, dynamic>.from(element));
+    }).toList();
   }
 
   /// Gets the name of the display by [displayId] of [getDisplays].
@@ -81,12 +87,12 @@ class DisplayManager {
   /// May be null.
   Future<String?> getNameByDisplayId(int displayId, {String? category}) async {
     List<Display> displays = await getDisplays(category: category) ?? [];
-
-    String? name;
-    for (var element in displays) {
-      if (element.displayId == displayId) name = element.name;
+    for (final display in displays) {
+      if (display.displayId == displayId) {
+        return display.name;
+      }
     }
-    return name;
+    return null;
   }
 
   /// Gets the name of the display by [index] of [getDisplays].
@@ -100,9 +106,10 @@ class DisplayManager {
   /// May be null.
   Future<String?> getNameByIndex(int index, {String? category}) async {
     List<Display> displays = await getDisplays(category: category) ?? [];
-    String? name;
-    if (index >= 0 && index <= displays.length) name = displays[index].name;
-    return name;
+    if (index >= 0 && index < displays.length) {
+      return displays[index].name;
+    }
+    return null;
   }
 
   /// Creates a new secondary display that is attached to the specified display
@@ -116,12 +123,12 @@ class DisplayManager {
   /// return [Future<bool>] about the status has been display or not
   Future<bool?>? showSecondaryDisplay(
       {required int displayId, required String routerName}) async {
-    return await _displayMethodChannel?.invokeMethod<bool?>(
+    return await _displayMethodChannel.invokeMethod<bool?>(
         _showPresentation,
-        "{"
-        "\"displayId\": $displayId,"
-        "\"routerName\": \"$routerName\""
-        "}");
+        {
+          "displayId": displayId,
+          "routerName": routerName,
+        });
   }
 
   /// Hides secondary display that is attached to the specified display
@@ -131,11 +138,11 @@ class DisplayManager {
   ///
   /// return [Future<bool>] about the status has been display or not
   Future<bool?>? hideSecondaryDisplay({required int displayId}) async {
-    return await _displayMethodChannel?.invokeMethod<bool?>(
+    return await _displayMethodChannel.invokeMethod<bool?>(
         _hidePresentation,
-        "{"
-        "\"displayId\": $displayId"
-        "}");
+        {
+          "displayId": displayId,
+        });
   }
 
   /// Transfer data to a secondary display
@@ -191,13 +198,13 @@ class DisplayManager {
   ///
   /// return [Future<bool>] the value to determine whether or not the data has been transferred successfully
   Future<bool?>? transferDataToPresentation(dynamic arguments) async {
-    return await _displayMethodChannel?.invokeMethod<bool?>(
+    return await _displayMethodChannel.invokeMethod<bool?>(
         _transferDataToPresentation, arguments);
   }
 
   /// Subscribe to the stream to get notifications about connected / disconnected displays
   /// Streams [1] for new connected display and [0] for disconnected display
-  Stream<int?>? get connectedDisplaysChangedStream {
-    return _displayEventChannel?.receiveBroadcastStream().cast();
+  Stream<int?> get connectedDisplaysChangedStream {
+    return _displayEventChannel.receiveBroadcastStream().cast();
   }
 }
