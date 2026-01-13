@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:presentation_displays_hig/display.dart';
+import 'display.dart';
 
 const _listDisplay = "listDisplay";
 const _showPresentation = "showPresentation";
