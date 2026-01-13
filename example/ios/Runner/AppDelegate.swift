@@ -1,6 +1,6 @@
 import UIKit
 import Flutter
-import presentation_displays
+import presentation_displays_hig
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {

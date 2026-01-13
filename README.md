@@ -127,7 +127,7 @@ Replace your `AppDelegate.swift` content with:
 ```swift
 import UIKit
 import Flutter
-import presentation_displays
+import presentation_displays_hig
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -165,7 +165,7 @@ import presentation_displays
 ### 1. Initialize Display Manager
 
 ```dart
-import 'package:presentation_displays/displays_manager.dart';
+import 'package:presentation_displays_hig/displays_manager.dart';
 
 DisplayManager displayManager = DisplayManager();
 

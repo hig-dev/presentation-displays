@@ -1,9 +1,9 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint presentation_displays.podspec' to validate before publishing.
+# Run `pod lib lint presentation_displays_hig.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'presentation_displays'
+  s.name             = 'presentation_displays_hig'
   s.version          = '0.0.1'
   s.summary          = 'Flutter plugin supports to run on two screens. It\'s basically a tablet connected to another screen via an HDMI or Wireless'
   s.description      = <<-DESC
@@ -21,3 +21,4 @@ Flutter plugin supports to run on two screens. It\'s basically a tablet connecte
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.swift_version = '5.0'
 end
+

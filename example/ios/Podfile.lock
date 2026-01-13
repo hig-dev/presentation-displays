@@ -1,21 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - presentation_displays (0.0.1):
+  - presentation_displays_hig (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - presentation_displays (from `.symlinks/plugins/presentation_displays/ios`)
+  - presentation_displays_hig (from `.symlinks/plugins/presentation_displays_hig/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  presentation_displays:
-    :path: ".symlinks/plugins/presentation_displays/ios"
+  presentation_displays_hig:
+    :path: ".symlinks/plugins/presentation_displays_hig/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  presentation_displays: 1fa610b7c79d3fa4a6d9c7b43bd08b9e4220deff
+  presentation_displays_hig: d3865f2187e8012f74ac33580ddb403a34b35e12
 
 PODFILE CHECKSUM: 0dbd5a87e0ace00c9610d2037ac22083a01f861d
 
