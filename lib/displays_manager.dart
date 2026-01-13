@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:presentation_displays/display.dart';
+import 'package:presentation_displays_hig/display.dart';
 
 const _listDisplay = "listDisplay";
 const _showPresentation = "showPresentation";
@@ -24,8 +24,7 @@ const _transferDataToPresentation = "transferDataToPresentation";
 ///
 /// [DisplayManager.getDisplays]
 ///
-const String DISPLAY_CATEGORY_PRESENTATION =
-    "android.hardware.display.category.PRESENTATION";
+const String DISPLAY_CATEGORY_PRESENTATION = "android.hardware.display.category.PRESENTATION";
 
 /// Provide you with the method for you to work with [SecondaryDisplay].
 class DisplayManager {
@@ -121,14 +120,11 @@ class DisplayManager {
   /// </P>
   ///
   /// return [Future<bool>] about the status has been display or not
-  Future<bool?>? showSecondaryDisplay(
-      {required int displayId, required String routerName}) async {
-    return await _displayMethodChannel.invokeMethod<bool?>(
-        _showPresentation,
-        {
-          "displayId": displayId,
-          "routerName": routerName,
-        });
+  Future<bool?>? showSecondaryDisplay({required int displayId, required String routerName}) async {
+    return await _displayMethodChannel.invokeMethod<bool?>(_showPresentation, {
+      "displayId": displayId,
+      "routerName": routerName,
+    });
   }
 
   /// Hides secondary display that is attached to the specified display
@@ -138,11 +134,9 @@ class DisplayManager {
   ///
   /// return [Future<bool>] about the status has been display or not
   Future<bool?>? hideSecondaryDisplay({required int displayId}) async {
-    return await _displayMethodChannel.invokeMethod<bool?>(
-        _hidePresentation,
-        {
-          "displayId": displayId,
-        });
+    return await _displayMethodChannel.invokeMethod<bool?>(_hidePresentation, {
+      "displayId": displayId,
+    });
   }
 
   /// Transfer data to a secondary display
@@ -198,8 +192,7 @@ class DisplayManager {
   ///
   /// return [Future<bool>] the value to determine whether or not the data has been transferred successfully
   Future<bool?>? transferDataToPresentation(dynamic arguments) async {
-    return await _displayMethodChannel.invokeMethod<bool?>(
-        _transferDataToPresentation, arguments);
+    return await _displayMethodChannel.invokeMethod<bool?>(_transferDataToPresentation, arguments);
   }
 
   /// Subscribe to the stream to get notifications about connected / disconnected displays
