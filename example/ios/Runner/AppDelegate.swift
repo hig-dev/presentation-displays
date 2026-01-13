@@ -1,7 +1,7 @@
 import UIKit
 import Flutter
 import presentation_displays
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
     _ application: UIApplication,
