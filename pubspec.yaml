@@ -1,7 +1,7 @@
 name: presentation_displays_hig
 description: Flutter plugin supports to run on two screens. It's basically a tablet connected to another screen via an HDMI or Wireless
 homepage: https://github.com/hig-dev/presentation-displays
-version: 2.2.0
+version: 2.2.1
 
 environment:
   sdk: ^3.12.0

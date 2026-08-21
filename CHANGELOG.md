@@ -1,3 +1,8 @@
+## 2.2.1
+
+- Fixes Objective-C plugin registration (`GeneratedPluginRegistrant`) when using Swift Package Manager by exposing `PresentationDisplaysPlugin` directly with `@objc`.
+- Retains `SwiftPresentationDisplaysPlugin` typealias for Swift compatibility.
+
 ## 2.2.0
 
 - Migrates iOS plugin to use Swift Package Manager (SwiftPM) as recommended in Flutter 3.44+.
