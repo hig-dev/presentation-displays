@@ -1,3 +1,8 @@
+## 2.2.0
+
+- Migrates iOS plugin to use Swift Package Manager (SwiftPM) as recommended in Flutter 3.44+.
+- Maintains CocoaPods backward compatibility.
+
 ## 2.1.0
 
 - Updates minimum supported SDK version to Flutter 3.44/Dart 3.12.

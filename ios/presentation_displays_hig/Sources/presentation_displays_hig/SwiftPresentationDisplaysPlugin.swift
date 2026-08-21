@@ -174,6 +174,8 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
     }
 }
 
+public typealias PresentationDisplaysPlugin = SwiftPresentationDisplaysPlugin
+
 class DisplayConnectedStreamHandler: NSObject, FlutterStreamHandler {
     var sink: FlutterEventSink?
     
