@@ -1,13 +1,14 @@
 import Flutter
 import UIKit
 
-public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
+@objc(PresentationDisplaysPlugin)
+public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
     var additionalWindows = [UIScreen: UIWindow]()
     var screens = [UIScreen]()
     var flutterEngineChannel: FlutterMethodChannel? = nil
     
     // Callback to register plugins on the new engine
-    public static var controllerAdded: ((FlutterViewController) -> Void)?
+    @objc public static var controllerAdded: ((FlutterViewController) -> Void)?
 
     public override init() {
         super.init()
@@ -15,9 +16,9 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
         startObservingLifecycle()
     }
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
+    @objc public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "presentation_displays_plugin", binaryMessenger: registrar.messenger())
-        let instance = SwiftPresentationDisplaysPlugin()
+        let instance = PresentationDisplaysPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         
         let eventChannel = FlutterEventChannel(name: "presentation_displays_plugin_events", binaryMessenger: registrar.messenger())
@@ -36,7 +37,7 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenDidDisconnect),
-            name: UIScreen.didDisconnectNotification,
+            name: UIScene.didDisconnectNotification,
             object: nil
         )
     }
@@ -155,7 +156,7 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
             flutterEngine.run(withEntrypoint: "secondaryDisplayMain", initialRoute: routerName)
             
             let extVC = FlutterViewController(engine: flutterEngine, nibName: nil, bundle: nil)
-            SwiftPresentationDisplaysPlugin.controllerAdded?(extVC)
+            PresentationDisplaysPlugin.controllerAdded?(extVC)
             
             window.rootViewController = extVC
             self.flutterEngineChannel = FlutterMethodChannel(name: "presentation_displays_plugin_engine", binaryMessenger: extVC.binaryMessenger)
@@ -174,7 +175,7 @@ public class SwiftPresentationDisplaysPlugin: NSObject, FlutterPlugin {
     }
 }
 
-public typealias PresentationDisplaysPlugin = SwiftPresentationDisplaysPlugin
+public typealias SwiftPresentationDisplaysPlugin = PresentationDisplaysPlugin
 
 class DisplayConnectedStreamHandler: NSObject, FlutterStreamHandler {
     var sink: FlutterEventSink?
