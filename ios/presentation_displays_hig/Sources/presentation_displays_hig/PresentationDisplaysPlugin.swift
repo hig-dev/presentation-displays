@@ -5,6 +5,7 @@ import UIKit
 public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
     var additionalWindows = [UIScreen: UIWindow]()
     var screens = [UIScreen]()
+    var screenIsBuiltin = [UIScreen: Bool]()
     var flutterEngineChannel: FlutterMethodChannel? = nil
     
     // Callback to register plugins on the new engine
@@ -13,6 +14,7 @@ public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
     public override init() {
         super.init()
         screens.append(UIScreen.main)
+        screenIsBuiltin[UIScreen.main] = true
         startObservingLifecycle()
     }
     
@@ -45,8 +47,11 @@ public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
     @objc private func sceneDidConnect(_ notification: Notification) {
         guard let scene = notification.object as? UIWindowScene else { return }
         
-        // Ensure this scene corresponds to an external screen
         let screen = scene.screen
+        let isBuiltin = (scene.session.role == .windowApplication)
+        screenIsBuiltin[screen] = isBuiltin
+
+        // Main screen is already added in init()
         if screen == UIScreen.main { return }
         
         createWindow(for: screen, withScene: scene)
@@ -59,6 +64,7 @@ public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
         if let index = self.screens.firstIndex(of: screen) {
             self.screens.remove(at: index)
         }
+        screenIsBuiltin.removeValue(forKey: screen)
         
         // Teardown the window
         if let window = self.additionalWindows[screen] {
@@ -106,11 +112,20 @@ public class PresentationDisplaysPlugin: NSObject, FlutterPlugin {
     private func handleListDisplay(result: FlutterResult) {
         var displays = [[String: Any]]()
         
-        for (index, _) in screens.enumerated() {
-            let name = (index == 0) ? "Built-in Screen" : "Screen \(index)"
+        for (index, screen) in screens.enumerated() {
+            let isBuiltin = screenIsBuiltin[screen] ?? (index == 0)
+            
+            let name: String
+            if isBuiltin {
+                name = (index == 0) ? "Built-in Screen" : "Built-in Screen \(index)"
+            } else {
+                name = "Screen \(index)"
+            }
+            
             displays.append([
                 "displayId": index,
-                "name": name
+                "name": name,
+                "isBuiltin": isBuiltin
             ])
         }
         

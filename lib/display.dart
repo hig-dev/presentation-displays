@@ -1,3 +1,18 @@
+// ignore_for_file: constant_identifier_names
+
+/// Filter options for querying displays.
+enum DisplayFilter {
+  /// Returns all detected displays (both built-in and external).
+  all,
+
+  /// Returns only external displays (e.g. HDMI, AirPlay, secondary presentation monitors).
+  /// Excludes all built-in screens, including secondary screens on dual-screen/foldable devices.
+  externalOnly,
+
+  /// Returns only built-in displays integrated into the device chassis.
+  builtinOnly,
+}
+
 /// Provides information about of a logical display.
 /// <p>
 /// A logical display does not necessarily represent a particular physical display device
@@ -5,7 +20,7 @@
 /// display may be presented on one or more physical displays according to the devices
 /// that are currently attached and whether mirroring has been enabled.
 /// Use the following methods to query the real display area:
-/// [Display.displayId], [Display.flag], [Display.rotation], [Display.name]
+/// [Display.displayId], [Display.flag], [Display.rotation], [Display.name], [Display.isBuiltin]
 /// </p>
 ///
 class Display {
@@ -42,12 +57,20 @@ class Display {
   /// @return The display's name.
   final String? name;
 
+  /// Indicates whether the display is physically built into the device chassis
+  /// (such as standard phone screens or both screens of dual-screen / foldable devices like iPhone Duo).
+  final bool isBuiltin;
+
   Display({
     required this.displayId,
     this.flag,
     required this.name,
     this.rotation,
+    this.isBuiltin = false,
   });
+
+  /// Helper getter indicating whether this display is external (not built-in).
+  bool get isExternal => !isBuiltin;
 
   /// Factory constructor to create a Display from a map.
   factory Display.fromJson(Map<String, dynamic> json) {
@@ -56,6 +79,7 @@ class Display {
       flag: json['flags'],
       name: json['name'],
       rotation: json['rotation'],
+      isBuiltin: (json['isBuiltin'] as bool?) ?? (json['displayId'] == DEFAULT_DISPLAY),
     );
   }
 }

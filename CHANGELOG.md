@@ -1,3 +1,9 @@
+## 3.0.0
+
+* **Feature (iPhone Duo & Foldables):** Detects whether displays are built-in vs external (`Display.isBuiltin` and `Display.isExternal`). On dual-screen devices like Apple's iPhone Duo, both built-in screens are identified as built-in so applications do not mistakenly target the second screen as an external presentation display.
+* **Feature:** Added `DisplayFilter` enum (`DisplayFilter.all`, `DisplayFilter.externalOnly`, `DisplayFilter.builtinOnly`) for type-safe filtering of displays in `DisplayManager.getDisplays`, `getNameByDisplayId`, and `getNameByIndex`.
+* **Breaking Change:** Removed the legacy Android-specific `DISPLAY_CATEGORY_PRESENTATION` constant and raw `category` string parameter across `DisplayManager` and native platform channels in favor of `DisplayFilter`.
+
 ## 2.2.1
 
 - Fixes Objective-C plugin registration (`GeneratedPluginRegistrant`) when using Swift Package Manager by exposing `PresentationDisplaysPlugin` directly with `@objc`.

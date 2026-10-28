@@ -84,6 +84,7 @@ class DisplayManagerScreen extends StatefulWidget {
 class _DisplayManagerScreenState extends State<DisplayManagerScreen> {
   DisplayManager displayManager = DisplayManager();
   List<Display?> displays = [];
+  DisplayFilter _selectedFilter = DisplayFilter.all;
 
   final TextEditingController _indexToShareController = TextEditingController();
   final TextEditingController _dataToTransferController = TextEditingController();
@@ -133,10 +134,25 @@ class _DisplayManagerScreenState extends State<DisplayManagerScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        const SizedBox(height: 8),
+        SegmentedButton<DisplayFilter>(
+          segments: const [
+            ButtonSegment(value: DisplayFilter.all, label: Text('All')),
+            ButtonSegment(value: DisplayFilter.externalOnly, label: Text('External')),
+            ButtonSegment(value: DisplayFilter.builtinOnly, label: Text('Built-in')),
+          ],
+          selected: {_selectedFilter},
+          onSelectionChanged: (Set<DisplayFilter> newSelection) {
+            setState(() {
+              _selectedFilter = newSelection.first;
+            });
+          },
+        ),
+        const SizedBox(height: 8),
         Button(
             title: "Get Displays",
             onPressed: () async {
-              final values = await displayManager.getDisplays();
+              final values = await displayManager.getDisplays(filter: _selectedFilter);
               displays.clear();
               setState(() {
                 displays.addAll(values!);
@@ -148,10 +164,32 @@ class _DisplayManagerScreenState extends State<DisplayManagerScreen> {
             padding: const EdgeInsets.all(8),
             itemCount: displays.length,
             itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: 50,
-                child:
-                    Center(child: Text(' ${displays[index]?.displayId} ${displays[index]?.name}')),
+              final display = displays[index];
+              final isBuiltin = display?.isBuiltin ?? false;
+              final typeLabel = isBuiltin ? "Built-in" : "External";
+              final badgeColor = isBuiltin ? Colors.blueGrey : Colors.teal;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${display?.displayId}: ${display?.name}'),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: badgeColor),
+                      ),
+                      child: Text(
+                        typeLabel,
+                        style: TextStyle(
+                            color: badgeColor, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               );
             }),
         const Divider()
@@ -181,6 +219,15 @@ class _DisplayManagerScreenState extends State<DisplayManagerScreen> {
               if (displayId != null) {
                 for (final display in displays) {
                   if (display?.displayId == displayId) {
+                    if (display?.isBuiltin == true) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Notice: Display $displayId (${display?.name}) is marked as built-in. Presentation displays are typically shown on external screens.'),
+                          duration: const Duration(seconds: 4),
+                        ),
+                      );
+                    }
                     displayManager.showSecondaryDisplay(
                         displayId: displayId, routerName: "presentation");
                   }

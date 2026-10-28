@@ -173,33 +173,37 @@ DisplayManager displayManager = DisplayManager();
 
 ### 2. List Connected Displays
 
+On modern multi-display devices (such as foldable phones or Apple's dual-screen iPhone Duo), devices may have multiple built-in screens. Use `DisplayFilter.externalOnly` to ensure you only target external presentation displays (HDMI, AirPlay, secondary monitors) and filter out all built-in screens.
+
 ```dart
-List<Display> displays = [];
+List<Display> externalDisplays = [];
 
 Future<void> getDisplays() async {
-    final values = await displayManager.getDisplays();
+    // filter: DisplayFilter.externalOnly (default: DisplayFilter.all)
+    final values = await displayManager.getDisplays(filter: DisplayFilter.externalOnly);
     if (values != null) {
         setState(() {
-            displays = values;
+            externalDisplays = values;
         });
     }
 }
 
+// Or inspect a Display directly:
+// display.isBuiltin -> true for integrated device screens (including iPhone Duo dual screens)
+// display.isExternal -> true for external presentation monitors
 ```
 
 ### 3. Show Presentation
 
-Use the `displayId` from the list above and the `routerName` defined in your `MySecondApp` widget.
+Use the `displayId` from an external display and the `routerName` defined in your `MySecondApp` widget.
 
 ```dart
-// Index 0 is usually the built-in screen, Index 1 is the external display
-if (displays.length > 1) {
+if (externalDisplays.isNotEmpty) {
     await displayManager.showSecondaryDisplay(
-        displayId: displays[1].displayId!, 
+        displayId: externalDisplays.first.displayId!, 
         routerName: "presentation"
     );
 }
-
 ```
 
 ### 4. Transfer Data

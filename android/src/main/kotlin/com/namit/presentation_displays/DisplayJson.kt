@@ -12,5 +12,7 @@ data class DisplayJson(
     @SerializedName("rotation")
     val rotation: Int,
     @SerializedName("name")
-    val name: String
+    val name: String,
+    @SerializedName("isBuiltin")
+    val isBuiltin: Boolean = false
 )

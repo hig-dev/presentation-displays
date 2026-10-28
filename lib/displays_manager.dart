@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -7,24 +9,6 @@ const _listDisplay = "listDisplay";
 const _showPresentation = "showPresentation";
 const _hidePresentation = "hidePresentation";
 const _transferDataToPresentation = "transferDataToPresentation";
-
-/// Display category: secondary display.
-/// <p>
-/// This category can be used to identify secondary displays that are suitable for
-/// use as presentation displays such as HDMI or Wireless displays.  Applications
-/// may automatically project their content to presentation displays to provide
-/// richer second screen experiences.
-/// </p>
-/// <p>
-/// Use the following methods to query the real display area:
-/// [DisplayManager.getDisplays], [DisplayManager.getNameByDisplayId],
-/// [DisplayManager.getNameByIndex], [DisplayManager.showSecondaryDisplay],
-/// [DisplayManager.transferDataToPresentation], [DisplayManager.hideSecondaryDisplay]
-/// </p>
-///
-/// [DisplayManager.getDisplays]
-///
-const String DISPLAY_CATEGORY_PRESENTATION = "android.hardware.display.category.PRESENTATION";
 
 /// Provide you with the method for you to work with [SecondaryDisplay].
 class DisplayManager {
@@ -39,22 +23,19 @@ class DisplayManager {
     _displayEventChannel = EventChannel(_displayEventChannelId);
   }
 
-  /// Gets all currently valid logical displays of the specified category.
+  /// Gets logical displays filtered by [filter].
   /// <p>
-  /// When there are multiple displays in a category the returned displays are sorted
-  /// of preference.  For example, if the requested category is
-  /// [DISPLAY_CATEGORY_PRESENTATION] and there are multiple secondary display
-  /// then the displays are sorted so that the first display in the returned array
-  /// is the most preferred secondary display.  The application may simply
-  /// use the first display or allow the user to choose.
+  /// Use [DisplayFilter.externalOnly] to query only external presentation displays
+  /// (such as HDMI, AirPlay, or secondary monitors), safely filtering out built-in screens
+  /// (including dual screens on devices like iPhone Duo or foldables).
   /// </p>
   ///
-  /// [category] The requested display category or null to return all displays.
-  /// @return An array containing all displays sorted by order of preference.
-  ///
-  /// See [DISPLAY_CATEGORY_PRESENTATION]
-  Future<List<Display>?> getDisplays({String? category}) async {
-    final result = await _displayMethodChannel.invokeMethod(_listDisplay, category);
+  /// [filter] Filter to apply ([DisplayFilter.all], [DisplayFilter.externalOnly], or [DisplayFilter.builtinOnly]).
+  /// @return An array containing displays matching the filter.
+  Future<List<Display>?> getDisplays({
+    DisplayFilter filter = DisplayFilter.all,
+  }) async {
+    final result = await _displayMethodChannel.invokeMethod(_listDisplay);
 
     if (result == null) return [];
 
@@ -70,22 +51,32 @@ class DisplayManager {
     }
 
     // Map directly to Display objects without redundant re-encoding
-    return origins.map((element) {
+    final displays = origins.map((element) {
       return Display.fromJson(Map<String, dynamic>.from(element));
     }).toList();
+
+    switch (filter) {
+      case DisplayFilter.externalOnly:
+        return displays.where((d) => d.isExternal).toList();
+      case DisplayFilter.builtinOnly:
+        return displays.where((d) => d.isBuiltin).toList();
+      case DisplayFilter.all:
+        return displays;
+    }
   }
 
   /// Gets the name of the display by [displayId] of [getDisplays].
   /// <p>
   /// Note that some displays may be renamed by the user.
-  /// [category] The requested display category or null to return all displays.
-  /// See [DISPLAY_CATEGORY_PRESENTATION]
   /// </p>
   ///
   /// @return The display's name.
   /// May be null.
-  Future<String?> getNameByDisplayId(int displayId, {String? category}) async {
-    List<Display> displays = await getDisplays(category: category) ?? [];
+  Future<String?> getNameByDisplayId(
+    int displayId, {
+    DisplayFilter filter = DisplayFilter.all,
+  }) async {
+    List<Display> displays = await getDisplays(filter: filter) ?? [];
     for (final display in displays) {
       if (display.displayId == displayId) {
         return display.name;
@@ -97,14 +88,15 @@ class DisplayManager {
   /// Gets the name of the display by [index] of [getDisplays].
   /// <p>
   /// Note that some displays may be renamed by the user.
-  /// [category] The requested display category or null to return all displays.
-  /// see [DISPLAY_CATEGORY_PRESENTATION]
   /// </p>
   ///
   /// @return The display's name
   /// May be null.
-  Future<String?> getNameByIndex(int index, {String? category}) async {
-    List<Display> displays = await getDisplays(category: category) ?? [];
+  Future<String?> getNameByIndex(
+    int index, {
+    DisplayFilter filter = DisplayFilter.all,
+  }) async {
+    List<Display> displays = await getDisplays(filter: filter) ?? [];
     if (index >= 0 && index < displays.length) {
       return displays[index].name;
     }

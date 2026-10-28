@@ -57,7 +57,7 @@ class PresentationDisplaysPlugin : FlutterPlugin, ActivityAware, MethodChannel.M
         when (call.method) {
             "showPresentation" -> handleShowPresentation(call.arguments, result)
             "hidePresentation" -> handleHidePresentation(call.arguments, result)
-            "listDisplay" -> handleListDisplay(call.arguments, result)
+            "listDisplay" -> handleListDisplay(result)
             "transferDataToPresentation" -> {
                 try {
                     flutterEngineChannel?.invokeMethod("DataTransfer", call.arguments)
@@ -122,18 +122,34 @@ class PresentationDisplaysPlugin : FlutterPlugin, ActivityAware, MethodChannel.M
         }
     }
 
-    private fun handleListDisplay(categoryArg: Any?, result: MethodChannel.Result) {
-        val listJson = ArrayList<DisplayJson>()
-        val category = categoryArg as? String
+    private fun isDisplayBuiltin(display: android.view.Display): Boolean {
+        if (display.displayId == android.view.Display.DEFAULT_DISPLAY) {
+            return true
+        }
+        if ((display.flags and android.view.Display.FLAG_PRESENTATION) != 0) {
+            return false
+        }
+        return try {
+            val getTypeMethod = display.javaClass.getMethod("getType")
+            val type = getTypeMethod.invoke(display) as? Int
+            type == 1 // Display.TYPE_INTERNAL
+        } catch (_: Exception) {
+            false
+        }
+    }
 
-        val displays = displayManager?.getDisplays(category)
+    private fun handleListDisplay(result: MethodChannel.Result) {
+        val listJson = ArrayList<DisplayJson>()
+
+        val displays = displayManager?.displays
         displays?.forEach { display ->
             listJson.add(
                 DisplayJson(
                     displayId = display.displayId,
                     flags = display.flags,
                     rotation = display.rotation,
-                    name = display.name
+                    name = display.name,
+                    isBuiltin = isDisplayBuiltin(display)
                 )
             )
         }
